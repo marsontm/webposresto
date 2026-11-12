@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POS Restoran - Prototype</title>
+<style>
+:root{--bg:#eef2f6;--navy:#0f2540;--cyan:#17a9e0;--cyan2:#128fbf;--red:#e5484d;--green:#16a34a;--orange:#f6923a;--text:#1e293b;--muted:#7c8ba1;--bd:#e7ecf3;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+header{background:var(--navy);color:#fff;display:flex;align-items:center;gap:6px;padding:10px 18px;flex-wrap:wrap}
+header b{font-size:16px;margin-right:14px}
+header a{color:#cfe3f5;text-decoration:none;padding:9px 16px;border-radius:10px;font-weight:600}
+header a.on{background:var(--cyan);color:#fff}
+header .sp{flex:1}
+header button{background:#ffffff1f;color:#fff;border:0;border-radius:10px;padding:9px 14px;cursor:pointer}
+main{padding:18px;max-width:1180px;margin:auto}
+.card{background:#fff;border-radius:18px;padding:18px;margin-bottom:16px}
+h3{margin:0 0 12px;font-size:15px}
+.pos{display:grid;grid-template-columns:1fr 360px;gap:16px}
+@media(max-width:860px){.pos{grid-template-columns:1fr}}
+input,select,button{font:inherit}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;background:#fafbfc}
+.btn{background:var(--cyan);color:#fff;border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--cyan2)}.btn.g{background:#eef1f5;color:var(--text)}.btn.w{width:100%}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
+.item{border:1px solid var(--bd);border-radius:var(--r);padding:12px;background:#fff;text-align:left;cursor:pointer;min-height:84px}
+.item:hover{border-color:var(--cyan)}.item b{display:block;font-size:13px}.item span{color:var(--cyan2);font-weight:700}
+.ln{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.ln b{flex:1;font-size:13px}.q{width:34px;height:34px;border-radius:9px;border:0;background:#eef1f5;font-size:16px;cursor:pointer}
+.tot{display:flex;justify-content:space-between;font-size:18px;font-weight:800;margin:14px 0}
+.seg{display:flex;gap:8px;margin:10px 0}.seg button{flex:1;padding:11px;border:1px solid var(--bd);background:#fff;border-radius:10px;cursor:pointer;font-weight:600}
+.seg button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--navy);color:#fff;text-align:left;padding:10px;font-size:12px}
+td{padding:9px 10px;border-bottom:1px solid var(--bd)}
+.st{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:16px}
+.st div{background:#fff;border-radius:var(--r);padding:14px;border-left:5px solid var(--cyan)}
+.st small{color:var(--muted);font-weight:700}.st b{display:block;font-size:21px;margin-top:4px}
+.bd{display:inline-block;padding:3px 10px;border-radius:99px;color:#fff;font-size:11.5px;font-weight:700;background:var(--green)}
+.bd.lo{background:var(--red)}.pos-n{color:var(--green);font-weight:700}.neg{color:var(--red);font-weight:700}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:10px}
+.bars{display:flex;gap:8px;align-items:flex-end;height:120px}.bars i{flex:1;background:var(--cyan);border-radius:6px 6px 0 0;position:relative;min-height:3px}
+.bars em{position:absolute;bottom:-18px;left:0;right:0;text-align:center;font:11px sans-serif;color:var(--muted);font-style:normal}
+.ov{position:fixed;inset:0;background:#0f254066;display:none;align-items:center;justify-content:center;padding:16px;z-index:9}
+.ov.on{display:flex}.mod{background:#fff;border-radius:20px;padding:22px;width:100%;max-width:380px}
+.qr{width:150px;height:150px;margin:8px auto;background:conic-gradient(#000 25%,#fff 0 50%,#000 0 75%,#fff 0) 0 0/20px 20px;border:8px solid #fff;outline:1px solid var(--bd)}
+#t{position:fixed;top:14px;right:14px;background:var(--navy);color:#fff;padding:12px 16px;border-radius:12px;display:none;z-index:10;max-width:300px}
+.note{color:var(--muted);font-size:12px;margin:6px 0 0}
+</style>
+</head>
+<body>
+<header><b>POS Restoran</b><a href="#kasir" id="n-kasir" onclick="go('kasir',event)">Kasir</a><a href="#belanja" id="n-belanja" onclick="go('belanja',event)">Belanja &amp; Stok</a><a href="#dash" id="n-dash" onclick="go('dash',event)">Dashboard</a><span class="sp"></span><button onclick="reset()">Reset data demo</button></header>
+<main id="v"></main>
+<div class="ov" id="ov"><div class="mod" id="mod"></div></div>
+<div id="t"></div>
+<script>
+const M=[["Jus Alpukat",15000],["Jus Semangka",12000],["Jus Sirsak",13000],["Jus Melon",12000],["Jus Mangga",13000],["Jus Buah Naga",14000],["Teh Manis Panas",5000],["Es Teh Manis",6000],["Teh Tawar Panas",4000],["Es Teh Tawar",5000],["Teh Jahe Panas",8000],["Jeruk Manis Panas",8000],["Es Jeruk Manis",9000],["Lemon Tea Panas",9000],["Es Lemon Tea",10000],["Es Soda Gembira",12000],["Es Cincau",10000],["Kopi Jahe",10000],["Americano",12000],["Espresso",10000],["Es Kopi",12000],["Coklat Panas",10000]];
+const B=[["Gula Pasir","kg",16000,20],["Daun Teh","kg",60000,5],["Kopi Bean","kg",120000,5],["Alpukat","kg",30000,8],["Semangka","kg",8000,10],["Sirsak","kg",25000,6],["Melon","kg",12000,8],["Mangga","kg",20000,8],["Buah Naga","kg",25000,6],["Jeruk Manis","pcs",2000,60],["Jeruk Nipis","pcs",1000,60],["Jahe","kg",30000,3],["Jahe Bubuk","kg",80000,1],["Air Soda","pcs",8000,30],["Sirup Marjan","ml",60,3000],["Susu Kental Manis","gr",25,3000],["Cincau","pcs",20000,8],["Susu Coklat","gr",90,2000],["Coklat Bubuk","pack",4000,40],["Sedotan","pcs",100,500],["Gula Paketan","pcs",150,300]];
+const R=[[[3,.1],[0,.012],[17,20],[19,1]],[[4,.1],[0,.012],[19,1]],[[5,.1],[0,.012],[19,1]],[[6,.1],[0,.012],[19,1]],[[7,.1],[0,.012],[19,1]],[[8,.1],[0,.012],[19,1]],[[1,.003],[0,.006]],[[1,.009],[0,.018],[19,1]],[[1,.0045]],[[1,.009],[19,1]],[[1,.003],[11,.015],[0,.006]],[[9,.5],[0,.012]],[[9,.5],[0,.012],[19,1]],[[1,.006],[0,.012],[10,.35]],[[1,.009],[0,.018],[10,.5],[19,1]],[[13,.5],[14,20],[15,28],[19,1]],[[16,.25],[14,20],[19,1]],[[2,.01],[12,.008],[20,1]],[[2,.01],[20,1]],[[2,.01]],[[2,.01],[20,1],[19,1]],[[18,1]]];
+const $=s=>document.querySelector(s),rp=n=>'Rp '+Math.round(n).toLocaleString('id-ID'),DAY=864e5,K='pos-proto-1';
+let S,cart={},pay='Cash',tipe='Dine-in',cur='kasir';
+function seed(){let x=7,r=()=>(x=(x*9301+49297)%233280)/233280,sales=[];
+ for(let d=13;d>=0;d--)for(let k=0;k<4;k++){let it={},n=1+(r()*3|0);for(let j=0;j<n;j++)it[r()*22|0]=1+(r()*3|0);
+  let items=Object.entries(it).map(([a,b])=>[+a,b]);sales.push({t:Date.now()-d*DAY-k*36e5,m:r()>.5?'Cash':'QRIS',tp:r()>.4?'Dine-in':'Takeout',items,tot:items.reduce((s,[a,b])=>s+M[a][1]*b,0)})}
+ return{st:B.map(b=>b[3]),hg:B.map(b=>b[2]),sales,buys:[{t:Date.now()-5*DAY,k:'Maintenance',n:'Servis AC',rp:250000},{t:Date.now()-3*DAY,k:'Operasional/Service',n:'Listrik bulanan',rp:400000},{t:Date.now()-9*DAY,k:'Bahan Baku',n:'Gula Pasir 25kg',b:0,j:25,rp:400000}]}}
+function load(){try{S=JSON.parse(localStorage.getItem(K))}catch(e){}if(!S)S=seed()}
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+function reset(){open_(`<h3>Reset data demo</h3><p class="note">Semua transaksi dan pengeluaran yang kamu buat akan dihapus, data kembali ke contoh awal.</p><div class="row" style="margin-top:12px"><button class="btn g" onclick="close_()">Batal</button><button class="btn" onclick="S=seed();cart={};save();close_();route();toast('Data demo dikembalikan.')">Ya, reset</button></div>`)}
+function toast(m){let t=$('#t');t.textContent=m;t.style.display='block';clearTimeout(t.h);t.h=setTimeout(()=>t.style.display='none',2800)}
+function hpp(i){return R[i].reduce((s,[b,q])=>s+q*S.hg[b],0)}
+function open_(h){$('#mod').innerHTML=h;$('#ov').classList.add('on')}
+function close_(){$('#ov').classList.remove('on')}
+$('#ov').onclick=e=>{if(e.target.id=='ov')close_()};
+
+/* ---- KASIR ---- */
+function kasir(){return`<div class="pos"><div class="card"><h3>Menu</h3><input id="q" placeholder="Cari menu..." oninput="cari()"><div class="grid" id="g">${M.map((m,i)=>`<button class="item" data-n="${m[0].toLowerCase()}" onclick="add(${i})"><b>${m[0]}</b><span>${rp(m[1])}</span></button>`).join('')}</div></div>
+<div class="card"><h3>Keranjang</h3><div id="cart"></div></div></div>`}
+function cari(){let q=$('#q').value.toLowerCase();document.querySelectorAll('#g .item').forEach(e=>e.style.display=e.dataset.n.includes(q)?'':'none')}
+function add(i){cart[i]=(cart[i]||0)+1;rc()}
+function ch(i,d){cart[i]+=d;if(cart[i]<1)delete cart[i];rc()}
+function total(){return Object.entries(cart).reduce((s,[i,q])=>s+M[i][1]*q,0)}
+function rc(){const e=Object.entries(cart);$('#cart').innerHTML=(e.length?e.map(([i,q])=>`<div class="ln"><b>${M[i][0]}<br><small style="color:var(--muted)">${rp(M[i][1])}</small></b><button class="q" onclick="ch(${i},-1)">-</button>${q}<button class="q" onclick="ch(${i},1)">+</button></div>`).join(''):'<p class="note">Keranjang kosong. Ketuk menu di kiri untuk menambah pesanan.</p>')+
+`<div class="seg">${['Dine-in','Takeout'].map(t=>`<button class="${tipe==t?'on':''}" onclick="tipe='${t}';rc()">${t}</button>`).join('')}</div><div class="seg">${['Cash','QRIS'].map(t=>`<button class="${pay==t?'on':''}" onclick="pay='${t}';rc()">${t}</button>`).join('')}</div>
+<div class="tot"><span>Total</span><span>${rp(total())}</span></div><button class="btn w" onclick="bayar()">Bayar</button><button class="btn g w" style="margin-top:8px" onclick="cart={};rc()">Kosongkan</button>`}
+function kurang(){const need={};for(const[i,q]of Object.entries(cart))R[i].forEach(([b,u])=>need[b]=(need[b]||0)+u*q);return Object.entries(need).filter(([b,u])=>S.st[b]<u).map(([b])=>B[b][0])}
+function bayar(){if(!total())return toast('Keranjang masih kosong. Pilih menu dulu.');const k=kurang();if(k.length)return toast('Stok kurang: '+k.join(', ')+'. Isi stok di Belanja & Stok.');
+ open_(`<h3>Pembayaran ${pay}</h3><div class="tot"><span>Total</span><span>${rp(total())}</span></div>`+(pay=='Cash'?`<input id="u" type="number" placeholder="Uang diterima" oninput="kem()"><p class="note" id="k"></p>`:`<div class="qr"></div><p class="note">QR contoh untuk presentasi. Pembayaran dianggap lunas saat dikonfirmasi.</p>`)+`<div class="row" style="margin-top:12px"><button class="btn g" onclick="close_()">Batal</button><button class="btn" onclick="lunas()">Konfirmasi</button></div>`)}
+function kem(){const u=+$('#u').value;$('#k').textContent=u>=total()?'Kembalian '+rp(u-total()):'Kurang '+rp(total()-u)}
+function lunas(){const items=Object.entries(cart).map(([i,q])=>[+i,q]),tot=total();
+ items.forEach(([i,q])=>R[i].forEach(([b,u])=>S.st[b]-=u*q));S.sales.push({t:Date.now(),m:pay,tp:tipe,items,tot});save();
+ open_(`<h3>Transaksi berhasil</h3>${items.map(([i,q])=>`<div class="ln"><b>${q} x ${M[i][0]}</b>${rp(M[i][1]*q)}</div>`).join('')}<div class="tot"><span>Total (${pay}, ${tipe})</span><span>${rp(tot)}</span></div><button class="btn w" onclick="close_()">Selesai</button>`);cart={};rc()}
+
+/* ---- BELANJA & STOK ---- */
+function belanja(){const lo=(i)=>S.st[i]<B[i][3]*.2;return`<div class="card"><h3>Catat pengeluaran</h3><form onsubmit="simpan(event)"><div class="row"><select id="bk" onchange="$('#bb').style.display=this.value=='Bahan Baku'?'':'none'"><option>Bahan Baku</option><option>Investasi</option><option>Maintenance</option><option>Operasional/Service</option></select><input id="bn" placeholder="Nama barang / pengeluaran" required><select id="bb">${B.map((b,i)=>`<option value="${i}">${b[0]} (${b[1]})</option>`).join('')}</select></div><div class="row"><input id="bj" type="number" step="any" min="0" placeholder="Jumlah (satuan bahan)"><input id="br" type="number" min="0" placeholder="Total biaya (Rp)" required></div><button class="btn">Simpan pengeluaran</button><p class="note">Belanja bahan baku langsung menambah stok dan memperbarui harga bahan untuk HPP.</p></form></div>
+<div class="card"><h3>Stok bahan baku</h3><table><tr><th>Bahan</th><th>Stok</th><th>Harga / satuan</th><th>Status</th></tr>${B.map((b,i)=>`<tr><td>${b[0]}</td><td>${+S.st[i].toFixed(3)} ${b[1]}</td><td>${rp(S.hg[i])}</td><td><span class="bd ${lo(i)?'lo':''}">${lo(i)?'Segera restock':'Aman'}</span></td></tr>`).join('')}</table></div>
+<div class="card"><h3>Riwayat pengeluaran</h3><table><tr><th>Tanggal</th><th>Kategori</th><th>Barang</th><th>Biaya</th></tr>${[...S.buys].sort((a,b)=>b.t-a.t).slice(0,10).map(x=>`<tr><td>${new Date(x.t).toLocaleDateString('id-ID')}</td><td>${x.k}</td><td>${x.n}</td><td>${rp(x.rp)}</td></tr>`).join('')}</table></div>`}
+function simpan(e){e.preventDefault();const k=$('#bk').value,rpv=+$('#br').value,j=+$('#bj').value,x={t:Date.now(),k,n:$('#bn').value,rp:rpv};
+ if(k=='Bahan Baku'){if(!(j>0))return toast('Isi jumlah bahan yang dibeli.');x.b=+$('#bb').value;x.j=j;S.st[x.b]+=j;S.hg[x.b]=rpv/j}
+ S.buys.push(x);save();toast('Pengeluaran tersimpan.');route()}
+
+/* ---- DASHBOARD ---- */
+function dash(){let rev=0,cost=0,q=M.map(()=>0);S.sales.forEach(s=>{rev+=s.tot;s.items.forEach(([i,n])=>{q[i]+=n;cost+=hpp(i)*n})});
+ const ops=S.buys.filter(b=>b.k!='Bahan Baku').reduce((a,b)=>a+b.rp,0),all=S.buys.reduce((a,b)=>a+b.rp,0),gp=rev-cost,np=gp-ops;
+ const days=[...Array(7)].map((_,k)=>{const d=new Date(Date.now()-(6-k)*DAY).toDateString();return[new Date(Date.now()-(6-k)*DAY).toLocaleDateString('id-ID',{weekday:'short'}),S.sales.filter(s=>new Date(s.t).toDateString()==d).reduce((a,s)=>a+s.tot,0)]}),mx=Math.max(...days.map(d=>d[1]),1);
+ const rows=M.map((m,i)=>({n:m[0],q:q[i],h:hpp(i),p:m[1]})).sort((a,b)=>b.q-a.q);
+ return`<div class="st"><div><small>Total penjualan</small><b>${rp(rev)}</b></div><div><small>Jumlah transaksi</small><b>${S.sales.length}</b></div><div style="border-color:var(--red)"><small>Total pengeluaran</small><b>${rp(all)}</b></div><div style="border-color:var(--orange)"><small>Laba kotor (est.)</small><b>${rp(gp)}</b></div><div style="border-color:${np>=0?'var(--green)':'var(--red)'}"><small>Laba bersih (est.)</small><b class="${np>=0?'pos-n':'neg'}">${rp(np)}</b></div></div>
+<p class="note" style="margin:-4px 4px 14px">Laba bersih = laba kotor dikurangi biaya selain bahan baku (${rp(ops)}). Belanja bahan baku tidak dikurangkan lagi karena sudah masuk HPP.</p>
+<div class="card"><h3>Penjualan 7 hari terakhir</h3><div class="bars" style="margin-bottom:24px">${days.map(d=>`<i style="height:${d[1]/mx*100}%" title="${rp(d[1])}"><em>${d[0]}</em></i>`).join('')}</div></div>
+<div class="card"><h3>Profitabilitas per menu</h3><table><tr><th>Menu</th><th>Terjual</th><th>HPP / porsi</th><th>Harga jual</th><th>Laba / porsi</th><th>Margin</th></tr>${rows.map(r=>`<tr><td>${r.n}</td><td>${r.q}</td><td>${rp(r.h)}</td><td>${rp(r.p)}</td><td class="${r.p>=r.h?'pos-n':'neg'}">${rp(r.p-r.h)}</td><td>${(100*(r.p-r.h)/r.p).toFixed(1)}%</td></tr>`).join('')}</table></div>`}
+
+const V={kasir,belanja,dash};
+function go(h,e){if(e)e.preventDefault();cur=h;try{history.replaceState(null,'','#'+h)}catch(x){}route()}
+function route(){const h=cur;['kasir','belanja','dash'].forEach(k=>$('#n-'+k).className=k==h?'on':'');$('#v').innerHTML=V[h]();if(h=='kasir')rc();if(h=='belanja')$('#bb').style.display=''}
+addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(V.hasOwnProperty(h)){cur=h;route()}});
+if(V.hasOwnProperty(location.hash.slice(1)))cur=location.hash.slice(1);
+load();route();
+</script>
+</body>
+</html>
